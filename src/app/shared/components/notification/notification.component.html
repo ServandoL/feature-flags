@@ -1,0 +1,12 @@
+<div *ngIf="isVisible$|async" class="notification-container flex flex-col">
+  <div class="flex rounded-2xl shadow shadow-green-600 p-4 bg-green-200"
+       *ngIf="(notification$|async)?.published === true">
+    <p>{{ (notification$ | async)?.name }} - {{ (notification$ | async)?.enabled }} -
+      Published: {{ (notification$ | async)?.published }} </p>
+  </div>
+  <div class="flex rounded-2xl shadow shadow-red-600 p-4 bg-red-200"
+       *ngIf="(notification$|async) && (notification$|async)?.published !== true">
+    <p>{{ (notification$ | async)?.name }} - {{ (notification$ | async)?.enabled }} -
+      Published: {{ (notification$ | async)?.published }} </p>
+  </div>
+</div>

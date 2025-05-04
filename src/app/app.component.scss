@@ -1,0 +1,6 @@
+@import "../theme";
+
+.app-layout {
+  height: calc(100vh - 50px);
+  background-color: lighten($app-pear, 30%);
+}
