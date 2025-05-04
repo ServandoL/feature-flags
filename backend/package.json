@@ -1,22 +1,26 @@
 {
-  "name": "feature-flags",
+  "name": "feature-flag-api",
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --loader ts-node/esm src/server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ServandoL/feature-flags.git"
+  },
+  "private": true,
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "socket.io": "^4.8.1"
-  },
-  "devDependencies": {
-    "@tsconfig/strictest": "^2.0.5",
-    "@types/express": "^5.0.1",
-    "@types/node": "^22.15.3",
-    "typescript": "^5.8.3"
   }
 }
