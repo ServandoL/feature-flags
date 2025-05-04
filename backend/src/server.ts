@@ -43,6 +43,10 @@ io.on("connection_error", (err) => {
   console.log(err.context);  // some additional error context
 });
 
+app.get('/flags/all', async (req, res) => {
+
+})
+
 httpServer.listen(3000, () => {
   console.log('listening on *:3000');
 })
