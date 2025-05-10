@@ -15,3 +15,8 @@ export interface FlagDescription {
   name: string;
   enabled: boolean;
 }
+
+export interface CreateFlagRequest {
+  appName: string;
+  name: string;
+}

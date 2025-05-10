@@ -9,5 +9,5 @@ import {NavigationComponent} from "./shared/components/navigation/navigation.com
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'ui';
+  title = 'Feature Flags';
 }

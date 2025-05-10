@@ -1,0 +1,14 @@
+@import "theme";
+
+#create-form-container {
+  border: 1px solid $app-purple;
+  border-radius: 5px;
+}
+
+.submit-flag-button {
+  @extend .app-button;
+}
+
+.create-button {
+  @extend .app-button;
+}

@@ -1,0 +1,25 @@
+<div id="create-form-container" class="flex flex-row p-4">
+  <div class="create" *ngIf="(createClicked$|async)===false">
+    <button class="create-button app-button" type="button" (click)="handleCreateClicked()">Create</button>
+  </div>
+  <div *ngIf="(createClicked$|async)===true" class="create-form flex flex-col">
+    <form [formGroup]="flagForm">
+      <div class="flag-input">
+        <label for="flagName">Flag Name</label>
+        <input
+          class="app-input"
+          id="flagName"
+          type="text"
+          formControlName="name"
+          placeholder="Enter flag name"
+          (keyup.enter)="handleCreateClicked()"
+        />
+        <p *ngIf="(flagForm.dirty && name.invalid) || (submittedWithError$|async)===true" class="flex rounded m-2 p-2 bg-red-200">Flag name is required.</p>
+      </div>
+    </form>
+    <div class="submit-flag flex justify-between m-4">
+      <button class="back-button" type="button" (click)="handleBackButton()">Back</button>
+      <button class="submit-flag-button app-button" type="button" (click)="submit()">Submit</button>
+    </div>
+  </div>
+</div>

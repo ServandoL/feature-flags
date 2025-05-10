@@ -1,9 +1,10 @@
 import express from "express";
 import {createServer} from "http";
 import {Server} from "socket.io";
-import {PublishEvents} from './interfaces.js';
+import {AppFlags, FlagDescription, PublishEvents} from './interfaces.js';
 import cors from "cors";
 import {MongoRepo} from './mongo.js';
+import {$AppFlags} from './constants.js';
 
 (async () => {
   await MongoRepo.connect()
@@ -46,8 +47,38 @@ import {MongoRepo} from './mongo.js';
     console.log(err.context);  // some additional error context
   });
 
-  app.get('/flags/all', async (req, res) => {
+  app.get('/flags/:appName', async (req, res) => {
+    const request = req.params.appName;
+    if (!request) {
+      /**
+       * send bad request status
+       */
+      res.status(400).json({
+        status: 'error',
+        message: 'appName is required'
+      });
+    } else {
+      console.log({query: {appName: request}})
+      const flags = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: request});
+      res.json(flags);
+    }
+  });
 
+  app.post('/flags/create', async (req, res) => {
+    const request = req.body as FlagDescription;
+    if (!request) {
+      /**
+       * send bad request status
+       */
+      res.status(400).json({
+        status: 'error',
+        message: 'request is required'
+      });
+    } else {
+      console.log({request});
+      const flag = await MongoRepo.instance.collection<FlagDescription>($AppFlags).insertOne(request);
+      res.status(200).json({success: true, flag});
+    }
   })
 
   httpServer.listen(3000, () => {

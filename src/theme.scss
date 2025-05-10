@@ -3,3 +3,45 @@ $app-pear: #D4D6B9;
 $app-gray: #66717E;
 $app-gray2: #383B53;
 $app-purple: #32213A;
+
+button.app-button {
+  background-color: $app-sage;
+  border-radius: 5px;
+  width: 75px;
+  padding: 10px;
+  &:hover {
+    background-color: darken($app-sage, 20%);
+  }
+
+  &:active {
+    background-color: darken($app-sage, 30%);
+  }
+}
+
+.back-button {
+  background-color: $app-gray;
+  border-radius: 5px;
+  width: 75px;
+  padding: 10px;
+
+  &:hover {
+    background-color: darken($app-gray, 20%);
+  }
+
+  &:active {
+    background-color: darken($app-gray, 30%);
+  }
+}
+
+input.app-input {
+  background-color: $app-pear;
+  border-radius: 5px;
+  padding: 10px;
+  width: 200px;
+
+  &:focus {
+    background-color: lighten($app-pear, 10%);
+    outline: none;
+    box-shadow: 0 0 5px $app-gray;
+  }
+}
