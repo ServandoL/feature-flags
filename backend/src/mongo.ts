@@ -6,16 +6,17 @@ export class MongoRepo {
   private readonly _db: Db;
 
   private constructor() {
+    const loc = MongoRepo.name;
     this._mongoClient = new MongoClient(process.env['MONGO_URL'] ?? 'mongodb://localhost:27017');
     this._db = this._mongoClient.db(process.env['MONGO_DB'] ?? 'test');
     this._mongoClient.on('connect', () => {
-      console.log('MongoDB connected');
+      console.log({location: loc + '.connect', message: 'MongoDB connected'});
     }).on('connectionReady', () => {
-      console.log('MongoDB connection ready');
+      console.log({location: loc + '.connectionReady', message: 'MongoDB connection ready'});
     }).on('connectionClosed', () => {
-      console.log('MongoDB connection closed');
+      console.log({location: loc + '.connectionClosed', message: 'MongoDB connection closed'});
     }).on('error', (error) => {
-      console.error('MongoDB connection error', error);
+      console.error({location: loc + '.error', message: 'MongoDB connection error', error});
     })
   }
 

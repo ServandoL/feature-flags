@@ -16,6 +16,11 @@ button.app-button {
   &:active {
     background-color: darken($app-sage, 30%);
   }
+
+  &:disabled {
+    background-color: lighten($app-sage, 20%);
+    cursor: not-allowed;
+  }
 }
 
 .back-button {

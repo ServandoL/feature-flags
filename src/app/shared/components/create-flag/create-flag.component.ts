@@ -12,6 +12,7 @@ import {AsyncPipe, NgIf} from '@angular/common';
     AsyncPipe,
     ReactiveFormsModule
   ],
+  standalone: true,
   templateUrl: './create-flag.component.html',
   styleUrl: './create-flag.component.scss'
 })

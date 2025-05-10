@@ -22,8 +22,8 @@ export class FlagsService {
     return this._createFlagResponse$.asObservable();
   }
 
-  getFlags(appName: string): Observable<AppFlagsResponse> {
-    return this._http.get<AppFlagsResponse>(`http://localhost:3000/flags/${appName}`).pipe(
+  getFlags(appName: string): Observable<AppFlagsResponse | null> {
+    return this._http.get<AppFlagsResponse | null>(`http://localhost:3000/flags/${appName}`).pipe(
       map(response => response),
       catchError(error => {
         console.error('Error fetching flags:', error);

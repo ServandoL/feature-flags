@@ -1,5 +1,30 @@
 <div id="portal-container" class="flex flex-row p-25">
   <div class="portal-content flex flex-col">
+    <div class="flex flex-col border-2 border-amber-200">
+      <form [formGroup]="findForm">
+        <div class="flex flex-col app-input m-2">
+          <label for="appName" class="text-xs">Enter app name</label>
+          <input
+            formControlName="appName"
+            class="app-input my-2"
+            id="appName"
+            type="text"
+            placeholder="Enter app name"
+          />
+          @if (!appNameControl.valid && (appNameControl.dirty || appNameControl.touched)) {
+            <p class="rounded m-2 w-50 bg-red-200">
+              App name is required.
+            </p>
+          }
+        </div>
+        <div class="m-2">
+          <button class="app-button" (click)="handleAppName()" [disabled]="!findForm.valid">Search</button>
+        </div>
+      </form>
+      <div class="flex flex-col m-2" *ngIf="(nullResponse$|async) === true">
+        <p class="rounded p-2 w-50 bg-yellow-200">Data not found for app: {{appNameControl.value}}</p>
+      </div>
+    </div>
     @for (flag of flags$|async; track flag.name) {
       <div class="flag-item flex flex-row justify-between items-center p-4">
         <div class="flag-name">
@@ -15,7 +40,7 @@
     }
   </div>
   <div class="form-container flex flex-col">
-    <app-create-flag [appName]="appName"></app-create-flag>
+    <app-create-flag [appName]="appNameControl.value ?? ''"></app-create-flag>
   </div>
 </div>
 <app-notification></app-notification>
