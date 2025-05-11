@@ -4,11 +4,24 @@
   width: 100%;
 }
 
+.hover-over-wrapper {
+  width: 100%;
+  z-index: 100;
+}
+
 .flag-item {
   width: 100%;
+}
+
+.flag-value {
+  cursor: pointer;
 }
 
 .form-container {
   border: 2px solid $app-green;
   border-radius: 10px;
+}
+
+.delete-icon {
+  cursor: pointer;
 }

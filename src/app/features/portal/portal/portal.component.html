@@ -28,15 +28,23 @@
         </div>
       </div>
       @for (flag of flags$|async; track flag.name) {
-        <div class="flag-item flex flex-row justify-between items-center p-4">
+        <div class="flag-item flex flex-row justify-between items-center p-4 relative">
+          <div class="hover-over-wrapper flex justify-end absolute" *ngIf="(isDeleted$|async)?.flagName === flag.name && (isVisible$|async)===true">
+            <app-hover-over-banner [messageType]="messageTypes.SUCCESS" message=""></app-hover-over-banner>
+          </div>
           <div class="flag-name">
             {{ flag.name }}
           </div>
-          <div class="flag-value" (click)="toggleFlag(flag)">
-            <img *ngIf="!flag.enabled" ngSrc="/assets/svg/toggle-circle-left-svgrepo-com.svg" width="25" height="25"
-                 alt="disabled"/>
-            <img *ngIf="flag.enabled" ngSrc="/assets/svg/toggle-circle-right-svgrepo-com.svg" width="25" height="25"
-                 alt="enabled"/>
+          <div class="flex flex-row gap-5">
+            <div class="flag-value" (click)="toggleFlag(flag)">
+              <img *ngIf="!flag.enabled" ngSrc="/assets/svg/toggle-circle-left-svgrepo-com.svg" width="25" height="25"
+                   alt="flag-disabled"/>
+              <img *ngIf="flag.enabled" ngSrc="/assets/svg/toggle-circle-right-svgrepo-com.svg" width="25" height="25"
+                   alt="flag-enabled"/>
+            </div>
+            <div class="delete-icon" (click)="deleteFlag(flag)">
+              <img ngSrc="assets/svg/trash-alt-svgrepo-com.svg" width="25" height="25" alt="delete-flag"/>
+            </div>
           </div>
         </div>
       }

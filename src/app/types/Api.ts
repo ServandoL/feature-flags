@@ -5,6 +5,8 @@ export interface CreateFlagResponse {
   flag: FlagDescription;
 }
 
+export type DeleteFlagRequest = CreateFlagRequest;
+
 export interface CreateFlagRequest {
   appName: string;
   name: string;

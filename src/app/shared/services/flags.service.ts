@@ -4,8 +4,7 @@ import {
   AppFlagsResponse,
   GenericApiResponse,
   CreateFlagRequest,
-  CreateFlagResponse,
-  UpdateFlagRequest
+  UpdateFlagRequest, DeleteFlagRequest
 } from '../../types/Api';
 import {catchError, map, Observable, of, Subject} from 'rxjs';
 
@@ -14,13 +13,21 @@ import {catchError, map, Observable, of, Subject} from 'rxjs';
 })
 export class FlagsService {
   private _http = inject(HttpClient);
-  private _createFlagResponse$ = new Subject<GenericApiResponse>()
+  private _createFlagResponse$ = new Subject<GenericApiResponse>();
+
+  deleteFlag(flag: DeleteFlagRequest): Observable<GenericApiResponse> {
+    return this._http.post<GenericApiResponse>('http://localhost:3000/flags/delete', flag).pipe(catchError(error => {
+      console.error({location: 'FlagsService.deleteFlag', message: error});
+      this._createFlagResponse$.error(error);
+      return of(error);
+    }));
+  }
 
   createFlag(flag: CreateFlagRequest): Observable<GenericApiResponse> {
     return this._http.post<GenericApiResponse>('http://localhost:3000/flags/create', flag).pipe(catchError(error => {
       console.error({location: 'FlagsService.createFlag', message: error});
       this._createFlagResponse$.error(error);
-      return [];
+      return of(error);
     }));
   }
 

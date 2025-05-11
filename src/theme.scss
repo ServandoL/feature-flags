@@ -5,9 +5,12 @@ $app-purple: #A917A3;
 $app-green: #4FE511;
 $app-red: #ED0423;
 $app-blue: #9DA9FA;
+$app-gray: #A9A9A9;
 
 $app-red-error: lighten($app-red, 40%);
 $app-green-success: lighten($app-green, 40%);
+$app-blue-info: lighten($app-blue, 40%);
+$app-sage-warning: lighten($app-sage, 40%);
 
 button.app-button {
   background-color: $app-pear;

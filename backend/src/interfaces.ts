@@ -26,3 +26,5 @@ export interface CreateFlagRequest {
   appName: string;
   name: string;
 }
+
+export type DeleteFlagRequest = CreateFlagRequest;

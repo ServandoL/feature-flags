@@ -1,0 +1,30 @@
+@import "theme";
+
+.hover-over-container {
+  width: 100px;
+}
+
+.success {
+  background-color: $app-green-success;
+  border: 2px solid darken($app-green-success, 10%);
+}
+
+.error {
+  background-color: $app-red-error;
+  border: 2px solid darken($app-red-error, 10%);
+}
+
+.warning {
+  background-color: $app-sage-warning;
+  border: 2px solid darken($app-sage-warning, 10%);
+}
+
+.info {
+  background-color: $app-blue-info;
+  border: 2px solid darken($app-blue-info, 10%);
+}
+
+.default {
+  background-color: $app-gray;
+  border: 2px solid darken($app-gray, 10%);
+}

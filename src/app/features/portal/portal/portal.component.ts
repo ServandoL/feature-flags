@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {FlagDescription} from '../../../types/FlagDescription';
-import {BehaviorSubject, find, Observable, Subject, take} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subject, switchMap, take, takeUntil} from 'rxjs';
 import {AsyncPipe, NgIf, NgOptimizedImage} from '@angular/common';
 import {PublishService} from '../../../shared/services/publish.service';
 import {NotificationComponent} from '../../../shared/components/notification/notification.component';
@@ -9,7 +9,10 @@ import {FlagsService} from '../../../shared/services/flags.service';
 import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CreateAppComponent} from '../../../shared/components/create-app/create-app.component';
 import {AppGlobalService} from '../../../shared/services/app-global.service';
-import {UpdateFlagRequest} from '../../../types/Api';
+import {DeleteFlagRequest, UpdateFlagRequest} from '../../../types/Api';
+import {HoverOverBannerComponent} from '../../../shared/components/hover-over-banner/hover-over-banner.component';
+import {MessageType} from '../../../types/Common';
+import {SharedUtils} from '../../../shared/utils/Utils';
 
 @Component({
   selector: 'app-portal',
@@ -21,12 +24,14 @@ import {UpdateFlagRequest} from '../../../types/Api';
     CreateFlagComponent,
     FormsModule,
     ReactiveFormsModule,
-    CreateAppComponent
+    CreateAppComponent,
+    HoverOverBannerComponent
   ],
   templateUrl: './portal.component.html',
   styleUrl: './portal.component.scss'
 })
-export class PortalComponent implements OnDestroy {
+export class PortalComponent implements OnDestroy, OnInit {
+  readonly messageTypes = MessageType;
   private _publishService = inject(PublishService);
   private _flagService = inject(FlagsService);
   private _globalService = inject(AppGlobalService);
@@ -39,11 +44,30 @@ export class PortalComponent implements OnDestroy {
   nullResponse$ = new BehaviorSubject<boolean>(false);
   appName$: Observable<string | null>;
   shouldShowAppCreateForm$ = this._globalService.handleNewAppClick$.asObservable();
+  errorResponse$ = new BehaviorSubject<string | null>(null);
+  isDeleted$ = new BehaviorSubject<{ flagName: string, success: boolean, message: string } | null>(null);
+  isVisible$: Observable<boolean> = SharedUtils.isVisible$(this.isDeleted$);
 
   constructor() {
     this.appName$ = this._globalService.currentAppName$.asObservable();
   }
 
+  ngOnInit() {
+    this._globalService.newFlagCreated$.pipe(switchMap(() => {
+      if (this._globalService.currentAppName$.value) {
+        return this._flagService.getFlags(this._globalService.currentAppName$.value)
+      } else {
+        return of(null);
+      }
+    }), takeUntil(this._destroy$)).subscribe(app => {
+      if (app) {
+        this.flags$.next(app.flags);
+        this._globalService.currentAppName$.next(app.appName);
+        this.nullResponse$.next(false);
+      }
+    })
+
+  }
 
   get appNameControl(): FormControl<string | null> {
     return this.findForm.controls.appName
@@ -96,6 +120,25 @@ export class PortalComponent implements OnDestroy {
     } else {
       console.warn({location: 'PortalComponent.handleAppName', message: 'Invalid app name'});
     }
+  }
+
+  deleteFlag(flag: FlagDescription) {
+    const request: DeleteFlagRequest = {
+      appName: this._globalService.currentAppName$.value ?? '',
+      name: flag.name
+    }
+    this._flagService.deleteFlag(request).pipe(take(1)).subscribe(response => {
+      if (response && response.success) {
+        console.log({location: 'PortalComponent.deleteFlag', message: response});
+        this.flags$.next(this.flags$.getValue().filter(f => f.name !== flag.name));
+        this.isDeleted$.next({flagName: flag.name, success: true, message: response.results.message});
+        this.errorResponse$.next(null);
+      } else {
+        console.warn({location: 'PortalComponent.deleteFlag', message: 'No response from server'});
+        this.errorResponse$.next('Error deleting flag');
+        this.isDeleted$.next({flagName: flag.name, success: false, message: 'Error'});
+      }
+    })
   }
 
   ngOnDestroy() {

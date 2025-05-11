@@ -1,7 +1,7 @@
 import express from "express";
 import {createServer} from "http";
 import {Server} from "socket.io";
-import {AppFlags, CreateFlagRequest, PublishEvents, UpdateFlagRequest} from './interfaces.js';
+import {AppFlags, CreateFlagRequest, DeleteFlagRequest, PublishEvents, UpdateFlagRequest} from './interfaces.js';
 import cors from "cors";
 import {MongoRepo} from './mongo.js';
 import {$AppFlags} from './constants.js';
@@ -51,8 +51,8 @@ import {$AppFlags} from './constants.js';
   });
 
   app.put('/flags/update', async (req, res) => {
-    const request = req.body as UpdateFlagRequest;
-    if (!request) {
+    const reqBody = req.body as UpdateFlagRequest;
+    if (!reqBody) {
       /**
        * send bad request status
        */
@@ -61,23 +61,23 @@ import {$AppFlags} from './constants.js';
         message: 'request is required'
       });
     } else {
-      console.log({location: 'server.flags.update', request})
-      const existingApp = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: request.appName});
+      console.log({location: 'server.flags.update', request: reqBody})
+      const existingApp = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: reqBody.appName});
       if (!existingApp) {
         console.warn({location: 'server.flags.update', message: 'App does not exist', existingApp});
         res.status(200).json({success: false, results: {message: 'app does not exist'}, __typename: 'UpdateOne'});
       } else {
-        const existingFlag = existingApp.flags.find(flag => flag.name === request.name);
+        const existingFlag = existingApp.flags.find(flag => flag.name === reqBody.name);
         if (!existingFlag) {
           console.warn({location: 'server.flags.update', message: 'Flag does not exist', existingFlag});
           res.status(200).json({success: false, results: {message: 'flag does not exist'}, __typename: 'UpdateOne'});
         } else {
           console.log({location: 'server.flags.update', message: 'Updating flag', existingFlag});
           const response = await MongoRepo.instance.collection<AppFlags>($AppFlags).updateOne(
-            {appName: request.appName, 'flags.name': request.name},
+            {appName: reqBody.appName, 'flags.name': reqBody.name},
             {
               $set: {
-                'flags.$.enabled': request.enabled
+                'flags.$.enabled': reqBody.enabled
               }
             }
           );
@@ -92,8 +92,8 @@ import {$AppFlags} from './constants.js';
   })
 
   app.get('/flags/:appName', async (req, res) => {
-    const request = req.params.appName;
-    if (!request) {
+    const reqBody = req.params.appName;
+    if (!reqBody) {
       /**
        * send bad request status
        */
@@ -102,15 +102,15 @@ import {$AppFlags} from './constants.js';
         message: 'appName is required'
       });
     } else {
-      console.log({location: 'server.flags.get', query: {appName: request}})
-      const flags = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: request});
+      console.log({location: 'server.flags.get', query: {appName: reqBody}})
+      const flags = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: reqBody});
       res.json(flags);
     }
   });
 
   app.post('/app/create', async (req, res) => {
-    const request = req.body as CreateFlagRequest;
-    if (!request) {
+    const reqBody = req.body as CreateFlagRequest;
+    if (!reqBody) {
       /**
        * send bad request status
        */
@@ -119,12 +119,12 @@ import {$AppFlags} from './constants.js';
         message: 'request is required'
       });
     } else {
-      const existingFlags = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: request.appName});
+      const existingFlags = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: reqBody.appName});
       if (!existingFlags) {
         const newFlag: AppFlags = {
-          appName: request.appName,
+          appName: reqBody.appName,
           flags: [{
-            name: request.name,
+            name: reqBody.name,
             enabled: false
           }]
         }
@@ -143,8 +143,8 @@ import {$AppFlags} from './constants.js';
   })
 
   app.post('/flags/create', async (req, res) => {
-    const request = req.body as CreateFlagRequest;
-    if (!request) {
+    const reqBody = req.body as CreateFlagRequest;
+    if (!reqBody) {
       /**
        * send bad request status
        */
@@ -153,18 +153,18 @@ import {$AppFlags} from './constants.js';
         message: 'request is required'
       });
     } else {
-      const existingFlags = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: request});
+      const existingFlags = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: reqBody.appName});
       if (!existingFlags) {
         console.warn({location: 'server.flags.create', message: 'App does not exist', existingFlags});
         res.status(200).json({success: false, results: {message: 'app does not exist'}, __typename: 'UpdateOne'});
       } else {
         console.log({location: 'server.flags.create', message: 'Creating new flag', existingFlags});
         const response = await MongoRepo.instance.collection<AppFlags>($AppFlags).updateOne(
-          {appName: request.appName},
+          {appName: reqBody.appName},
           {
             $addToSet: {
               flags: {
-                name: request.name,
+                name: reqBody.name,
                 enabled: false
               }
             }
@@ -174,6 +174,42 @@ import {$AppFlags} from './constants.js';
           res.status(200).json({success: true, results: {message: 'flag created'}, __typename: 'UpdateOne'});
         } else {
           res.status(200).json({success: false, results: {message: 'flag not created'}, __typename: 'UpdateOne'});
+        }
+      }
+    }
+  });
+
+  app.post('/flags/delete', async(req,res) => {
+    const reqBody = req.body as DeleteFlagRequest;
+    if (!reqBody) {
+      /**
+       * send bad reqBody status
+       */
+      res.status(400).json({
+        status: 'error',
+        message: 'reqBody is required'
+      });
+    } else {
+      const existingFlags = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: reqBody.appName});
+      if (!existingFlags) {
+        console.warn({location: 'server.flags.delete', message: 'App does not exist', existingFlags});
+        res.status(200).json({success: false, results: {message: 'app does not exist'}, __typename: 'UpdateOne'});
+      } else {
+        console.log({location: 'server.flags.delete', message: 'Delete flag', flag: reqBody.name});
+        const response = await MongoRepo.instance.collection<AppFlags>($AppFlags).updateOne(
+          {appName: reqBody.appName},
+          {
+            $pull: {
+              flags: {
+                name: reqBody.name,
+              }
+            }
+          }
+        );
+        if (response.acknowledged && response.modifiedCount) {
+          res.status(200).json({success: true, results: {message: 'flag deleted'}, __typename: 'UpdateOne'});
+        } else {
+          res.status(200).json({success: false, results: {message: 'flag not deleted'}, __typename: 'UpdateOne'});
         }
       }
     }
