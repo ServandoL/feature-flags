@@ -6,7 +6,8 @@ import {BehaviorSubject, Subject} from 'rxjs';
 })
 export class AppGlobalService {
 
-  readonly handleNewAppClick = new BehaviorSubject<boolean>(false);
+  readonly handleNewAppClick$ = new BehaviorSubject<boolean>(false);
+  readonly currentAppName$ = new BehaviorSubject<string | null>(null);
 
   constructor() { }
 }

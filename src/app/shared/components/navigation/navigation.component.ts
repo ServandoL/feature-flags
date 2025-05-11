@@ -14,7 +14,7 @@ export class NavigationComponent {
   private _globalService = inject(AppGlobalService);
 
   handleNewApp() {
-    this._globalService.handleNewAppClick.next(true);
+    this._globalService.handleNewAppClick$.next(true);
   }
 
 }

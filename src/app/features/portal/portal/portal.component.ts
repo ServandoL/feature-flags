@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {FlagDescription} from '../../../types/FlagDescription';
-import {BehaviorSubject, find, Subject, take} from 'rxjs';
+import {BehaviorSubject, find, Observable, Subject, take} from 'rxjs';
 import {AsyncPipe, NgIf, NgOptimizedImage} from '@angular/common';
 import {PublishService} from '../../../shared/services/publish.service';
 import {NotificationComponent} from '../../../shared/components/notification/notification.component';
@@ -9,6 +9,7 @@ import {FlagsService} from '../../../shared/services/flags.service';
 import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CreateAppComponent} from '../../../shared/components/create-app/create-app.component';
 import {AppGlobalService} from '../../../shared/services/app-global.service';
+import {UpdateFlagRequest} from '../../../types/Api';
 
 @Component({
   selector: 'app-portal',
@@ -25,7 +26,7 @@ import {AppGlobalService} from '../../../shared/services/app-global.service';
   templateUrl: './portal.component.html',
   styleUrl: './portal.component.scss'
 })
-export class PortalComponent implements OnInit, OnDestroy {
+export class PortalComponent implements OnDestroy {
   private _publishService = inject(PublishService);
   private _flagService = inject(FlagsService);
   private _globalService = inject(AppGlobalService);
@@ -36,11 +37,13 @@ export class PortalComponent implements OnInit, OnDestroy {
   })
   flags$ = new BehaviorSubject<FlagDescription[]>([]);
   nullResponse$ = new BehaviorSubject<boolean>(false);
-  appName$ = new BehaviorSubject<string |null>(null);
-  shouldShowAppCreateForm$ = this._globalService.handleNewAppClick.asObservable();
+  appName$: Observable<string | null>;
+  shouldShowAppCreateForm$ = this._globalService.handleNewAppClick$.asObservable();
 
-  ngOnInit() {
+  constructor() {
+    this.appName$ = this._globalService.currentAppName$.asObservable();
   }
+
 
   get appNameControl(): FormControl<string | null> {
     return this.findForm.controls.appName
@@ -51,9 +54,30 @@ export class PortalComponent implements OnInit, OnDestroy {
     const found = flags.find(f => f.name === flag.name);
     if (found) {
       found.enabled = !found.enabled;
-      this.flags$.next(flags);
-      this._publishService.publish(found);
+      this.handleUpdateFlag(found, flags);
     }
+  }
+
+  private handleUpdateFlag(flag: FlagDescription, flags: FlagDescription[]) {
+    const appName = this._globalService.currentAppName$.value;
+    if (!appName) {
+      console.warn({location: 'PortalComponent.handleUpdateFlag', message: 'No app name found'});
+      return;
+    }
+    const request: UpdateFlagRequest = {
+      appName,
+      name: flag.name,
+      enabled: flag.enabled
+    }
+    this._flagService.updateFlag(request).pipe(take(1)).subscribe(response => {
+      if (response && response.success) {
+        console.log({location: 'PortalComponent.handleUpdateFlag', message: response});
+        this._publishService.publish(flag);
+        this.flags$.next(flags);
+      } else {
+        console.warn({location: 'PortalComponent.handleUpdateFlag', message: 'No response from server'});
+      }
+    })
   }
 
   handleAppName() {
@@ -62,7 +86,7 @@ export class PortalComponent implements OnInit, OnDestroy {
         if (response) {
           console.log({location: 'PortalComponent.handleAppName', message: response});
           this.flags$.next(response.flags);
-          this.appName$.next(response.appName);
+          this._globalService.currentAppName$.next(response.appName);
           this.nullResponse$.next(false);
         } else {
           console.warn({location: 'PortalComponent.handleAppName', message: 'No flags found'});
@@ -78,6 +102,4 @@ export class PortalComponent implements OnInit, OnDestroy {
     this._destroy$.next();
     this._destroy$.complete();
   }
-
-  protected readonly find = find;
 }

@@ -1,7 +1,7 @@
 import express from "express";
 import {createServer} from "http";
 import {Server} from "socket.io";
-import {AppFlags, CreateFlagRequest, PublishEvents} from './interfaces.js';
+import {AppFlags, CreateFlagRequest, PublishEvents, UpdateFlagRequest} from './interfaces.js';
 import cors from "cors";
 import {MongoRepo} from './mongo.js';
 import {$AppFlags} from './constants.js';
@@ -49,6 +49,47 @@ import {$AppFlags} from './constants.js';
       context: err.context
     });
   });
+
+  app.put('/flags/update', async (req, res) => {
+    const request = req.body as UpdateFlagRequest;
+    if (!request) {
+      /**
+       * send bad request status
+       */
+      res.status(400).json({
+        status: 'error',
+        message: 'request is required'
+      });
+    } else {
+      console.log({location: 'server.flags.update', request})
+      const existingApp = await MongoRepo.instance.collection<AppFlags>($AppFlags).findOne({appName: request.appName});
+      if (!existingApp) {
+        console.warn({location: 'server.flags.update', message: 'App does not exist', existingApp});
+        res.status(200).json({success: false, results: {message: 'app does not exist'}, __typename: 'UpdateOne'});
+      } else {
+        const existingFlag = existingApp.flags.find(flag => flag.name === request.name);
+        if (!existingFlag) {
+          console.warn({location: 'server.flags.update', message: 'Flag does not exist', existingFlag});
+          res.status(200).json({success: false, results: {message: 'flag does not exist'}, __typename: 'UpdateOne'});
+        } else {
+          console.log({location: 'server.flags.update', message: 'Updating flag', existingFlag});
+          const response = await MongoRepo.instance.collection<AppFlags>($AppFlags).updateOne(
+            {appName: request.appName, 'flags.name': request.name},
+            {
+              $set: {
+                'flags.$.enabled': request.enabled
+              }
+            }
+          );
+          if (response.acknowledged && response.modifiedCount) {
+            res.status(200).json({success: true, results: {message: 'flag updated'}, __typename: 'UpdateOne'});
+          } else {
+            res.status(200).json({success: false, results: {message: 'flag not updated'}, __typename: 'UpdateOne'});
+          }
+        }
+      }
+    }
+  })
 
   app.get('/flags/:appName', async (req, res) => {
     const request = req.params.appName;

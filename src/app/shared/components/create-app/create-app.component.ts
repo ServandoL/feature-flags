@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy} from '@angular/core';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {FlagsService} from '../../services/flags.service';
-import {CreateAppResponse, CreateFlagRequest} from '../../../types/Api';
+import {GenericApiResponse, CreateFlagRequest} from '../../../types/Api';
 import {BehaviorSubject, catchError, of, take} from 'rxjs';
 import {AppGlobalService} from '../../services/app-global.service';
 import {AsyncPipe, NgOptimizedImage} from '@angular/common';
@@ -24,7 +24,7 @@ export class CreateAppComponent implements OnDestroy {
     appName: ['', Validators.required],
     flagName: ['', Validators.required],
   });
-  createResponse$ = new BehaviorSubject<CreateAppResponse | null>(null);
+  createResponse$ = new BehaviorSubject<GenericApiResponse | null>(null);
 
   get appNameControl() {
     return this.createAppForm.controls.appName;
@@ -35,7 +35,7 @@ export class CreateAppComponent implements OnDestroy {
   }
 
   handleClose() {
-    this._globalService.handleNewAppClick.next(false);
+    this._globalService.handleNewAppClick$.next(false);
   }
 
   handleSubmitForm() {

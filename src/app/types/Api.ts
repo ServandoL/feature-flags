@@ -15,10 +15,16 @@ export interface AppFlagsResponse {
   flags: FlagDescription[];
 }
 
-export interface CreateAppResponse {
+export interface GenericApiResponse {
   __typename: 'InsertOne' | 'UpdateOne';
   success: boolean;
   results: {
     message: string;
   };
+}
+
+export interface UpdateFlagRequest {
+  appName: string;
+  name: string;
+  enabled: boolean;
 }
