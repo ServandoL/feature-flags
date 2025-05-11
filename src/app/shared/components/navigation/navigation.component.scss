@@ -2,5 +2,10 @@
 
 #container {
   height: 50px;
-  background-color: $app-gray;
+  background-color: $app-blue;
+}
+
+.create-app-button {
+  width: 100px !important;
+  height: 25px !important;
 }

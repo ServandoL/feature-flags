@@ -1,0 +1,32 @@
+@import "theme";
+.close-button {
+  cursor: pointer;
+  position: absolute;
+  right: 5px;
+}
+
+form {
+  p.error {
+    background-color: $app-red-error;
+  }
+  p.success {
+    background-color: $app-green-success;
+  }
+}
+
+label {
+  &::after {
+    content: " *";
+    color: $app-red;
+  }
+}
+
+#create-app-container {
+  top: 0;
+  right: 0;
+  margin-top: 10px;
+  margin-right: 19px;
+  background-color: lighten($app-pear, 10%);
+  border: 2px solid $app-green;
+  border-radius: 10px;
+}

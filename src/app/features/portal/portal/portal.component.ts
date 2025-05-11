@@ -7,6 +7,8 @@ import {NotificationComponent} from '../../../shared/components/notification/not
 import {CreateFlagComponent} from '../../../shared/components/create-flag/create-flag.component';
 import {FlagsService} from '../../../shared/services/flags.service';
 import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {CreateAppComponent} from '../../../shared/components/create-app/create-app.component';
+import {AppGlobalService} from '../../../shared/services/app-global.service';
 
 @Component({
   selector: 'app-portal',
@@ -17,7 +19,8 @@ import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} 
     NotificationComponent,
     CreateFlagComponent,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CreateAppComponent
   ],
   templateUrl: './portal.component.html',
   styleUrl: './portal.component.scss'
@@ -25,6 +28,7 @@ import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} 
 export class PortalComponent implements OnInit, OnDestroy {
   private _publishService = inject(PublishService);
   private _flagService = inject(FlagsService);
+  private _globalService = inject(AppGlobalService);
   private _fb = inject(FormBuilder);
   private _destroy$ = new Subject<void>();
   findForm = this._fb.group({
@@ -32,6 +36,8 @@ export class PortalComponent implements OnInit, OnDestroy {
   })
   flags$ = new BehaviorSubject<FlagDescription[]>([]);
   nullResponse$ = new BehaviorSubject<boolean>(false);
+  appName$ = new BehaviorSubject<string |null>(null);
+  shouldShowAppCreateForm$ = this._globalService.handleNewAppClick.asObservable();
 
   ngOnInit() {
   }
@@ -56,6 +62,7 @@ export class PortalComponent implements OnInit, OnDestroy {
         if (response) {
           console.log({location: 'PortalComponent.handleAppName', message: response});
           this.flags$.next(response.flags);
+          this.appName$.next(response.appName);
           this.nullResponse$.next(false);
         } else {
           console.warn({location: 'PortalComponent.handleAppName', message: 'No flags found'});

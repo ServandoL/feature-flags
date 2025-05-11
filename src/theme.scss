@@ -1,14 +1,21 @@
 $app-sage: #D1CAA1;
 $app-pear: #D4D6B9;
-$app-gray: #66717E;
-$app-gray2: #383B53;
-$app-purple: #32213A;
+$app-pink: #8D5C6C;
+$app-purple: #A917A3;
+$app-green: #4FE511;
+$app-red: #ED0423;
+$app-blue: #9DA9FA;
+
+$app-red-error: lighten($app-red, 40%);
+$app-green-success: lighten($app-green, 40%);
 
 button.app-button {
-  background-color: $app-sage;
+  background-color: $app-pear;
   border-radius: 5px;
   width: 75px;
   padding: 10px;
+  cursor: pointer;
+
   &:hover {
     background-color: darken($app-sage, 20%);
   }
@@ -20,26 +27,29 @@ button.app-button {
   &:disabled {
     background-color: lighten($app-sage, 20%);
     cursor: not-allowed;
+    pointer-events: none;
   }
+
 }
 
 .back-button {
-  background-color: $app-gray;
+  background-color: $app-pink;
   border-radius: 5px;
   width: 75px;
   padding: 10px;
 
   &:hover {
-    background-color: darken($app-gray, 20%);
+    background-color: darken($app-pink, 20%);
   }
 
   &:active {
-    background-color: darken($app-gray, 30%);
+    background-color: darken($app-pink, 30%);
   }
 }
 
 input.app-input {
   background-color: $app-pear;
+  border: 2px solid darken($app-pear, 30%);
   border-radius: 5px;
   padding: 10px;
   width: 200px;
@@ -47,6 +57,6 @@ input.app-input {
   &:focus {
     background-color: lighten($app-pear, 10%);
     outline: none;
-    box-shadow: 0 0 5px $app-gray;
+    box-shadow: 0 0 5px $app-pink;
   }
 }

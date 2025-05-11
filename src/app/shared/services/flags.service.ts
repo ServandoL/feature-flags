@@ -1,24 +1,32 @@
 import {HttpClient} from '@angular/common/http';
 import {inject, Injectable} from '@angular/core';
-import {AppFlagsResponse, CreateFlagRequest, CreateFlagResponse} from '../../types/Api';
-import {catchError, map, Observable, Subject} from 'rxjs';
+import {AppFlagsResponse, CreateAppResponse, CreateFlagRequest, CreateFlagResponse} from '../../types/Api';
+import {catchError, map, Observable, of, Subject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FlagsService {
   private _http = inject(HttpClient);
-  private _createFlagResponse$ = new Subject<CreateFlagResponse>()
+  private _createFlagResponse$ = new Subject<CreateAppResponse>()
 
   createFlag(flag: CreateFlagRequest) {
-    return this._http.post<CreateFlagResponse>('http://localhost:3000/flags/create', flag).pipe(catchError(error => {
+    return this._http.post<CreateAppResponse>('http://localhost:3000/flags/create', flag).pipe(catchError(error => {
       console.error('Error creating flag:', error);
       this._createFlagResponse$.error(error);
       return [];
     }));
   }
 
-  get createFlagResponse$(): Observable<CreateFlagResponse> {
+  createApp(flag: CreateFlagRequest) {
+    return this._http.post<CreateAppResponse>('http://localhost:3000/app/create', flag).pipe(catchError(error => {
+      console.error('Error creating flag:', error);
+      this._createFlagResponse$.error(error);
+      return of(error);
+    }));
+  }
+
+  get createFlagResponse$(): Observable<CreateAppResponse> {
     return this._createFlagResponse$.asObservable();
   }
 

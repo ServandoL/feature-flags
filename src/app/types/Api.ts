@@ -14,3 +14,11 @@ export interface AppFlagsResponse {
   appName: string;
   flags: FlagDescription[];
 }
+
+export interface CreateAppResponse {
+  __typename: 'InsertOne' | 'UpdateOne';
+  success: boolean;
+  results: {
+    message: string;
+  };
+}

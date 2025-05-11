@@ -1,3 +1,7 @@
-<div id="container" class="flex flex-col">
-    <div class="p-2"><img priority width="30" height="30" ngSrc="/assets/svg/flag-svgrepo-com.svg" alt="home-icon"></div>
+<div id="container" class="flex flex-row justify-between items-center">
+  <div class="p-2"><img priority width="30" height="30" ngSrc="/assets/svg/flag-svgrepo-com.svg" alt="home-icon"></div>
+  <div class="flex flex-row justify-center mr-5">
+    <button class="app-button create-app-button flex justify-center items-center" (click)="handleNewApp()">New App
+    </button>
+  </div>
 </div>

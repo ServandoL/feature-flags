@@ -1,0 +1,49 @@
+<div id="create-app-container" class="flex flex-col absolute">
+  <div class="flex flex-col m-2 relative">
+    <div class="flex justify-between">
+      <h6 class="text-2xl m-2">Create a new app</h6>
+      <button class="close-button" (click)="handleClose()">
+        <img ngSrc="assets/svg/close-circle-svgrepo-com.svg" alt="close" height="25" width="25"/>
+      </button>
+    </div>
+    <form [formGroup]="createAppForm" class="flex flex-col gap-5">
+      <div class="flex flex-col m-2 gap-2">
+        <label for="app-name" class="text-xs">Enter app name</label>
+        <input
+          formControlName="appName"
+          class="app-input"
+          id="app-name"
+          type="text"
+          placeholder="Enter app name"
+        />
+        @if (appNameControl.invalid && (appNameControl.dirty || appNameControl.touched)) {
+          <p class="error rounded p-2">App name is invalid.</p>
+        }
+      </div>
+      <div class="flex flex-col m-2 gap-2">
+        <label for="flag-name" class="text-xs">Enter flag name</label>
+        <input
+          formControlName="flagName"
+          class="app-input"
+          id="flag-name"
+          type="text"
+          placeholder="Enter flag name"
+        />
+        @if (flagNameControl.invalid && (flagNameControl.dirty || flagNameControl.touched)) {
+          <p class="error rounded p-2">Flag name is invalid.</p>
+        }
+      </div>
+      <div class="creat-app-form-button gap-2 flex flex-col">
+        @if ((createResponse$|async)?.success) {
+          <p class="success rounded p-2">App created successfully.</p>
+        }
+        @if ((createResponse$|async)?.success === false) {
+          <p class="error rounded p-2">Error creating app {{ (createResponse$|async)?.results?.message }}</p>
+        }
+        <button class="app-button" [disabled]="createAppForm.invalid || (createResponse$|async)?.success"
+                (click)="handleSubmitForm()">Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
