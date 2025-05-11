@@ -12,7 +12,7 @@ export class IoService {
   private _isPublished$ = new BehaviorSubject<PublishedPayload | undefined>(undefined)
 
   constructor() {
-    this._socket = io('http://localhost:3000');
+    this._socket = io('http://localhost:3000?room=feature-flag-ui');
     this._socket.on('connect', () => {
       console.log({
         location: IoService.name + '.connect',

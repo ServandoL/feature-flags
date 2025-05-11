@@ -14,23 +14,29 @@ import {$AppFlags} from './constants.js';
     cors: {
       origin: '*',
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'apollo-require-preflight', 'x-apollo-operation-name']
+      allowedHeaders: ['Content-Type', 'Authorization', 'apollo-require-preflight', 'x-apollo-operation-name', 'x-socket-for']
     }
   });
   app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'apollo-require-preflight', 'x-apollo-operation-name'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'apollo-require-preflight', 'x-apollo-operation-name', 'x-socket-for'],
   }))
   app.use(express.json());
   app.use(express.urlencoded({extended: true}));
 
   io.on("connection", (socket) => {
-    console.log({location: 'server', message: 'a user connected', origin: socket.request.headers.origin});
-    // broadcast to all connected clients in the room
+    console.log({location: 'server', message: 'a user connected', socketFor: socket.handshake.query['room']});
+    const room = socket.handshake.query['room'];
+    if (room) {
+      socket.join(room);
+      console.log({location: 'server.socket.join', message: 'user joined room', room});
+    } else {
+      console.warn({location: 'server.socket.join', message: 'user did not join room'});
+    }
     socket.on(PublishEvents.FLAG, (event, callback) => {
       console.log({
-        location: 'server.connection',
+        location: 'server.socket.on.flag',
         message: event,
       });
       socket.emit(PublishEvents.FLAG, event);
@@ -82,6 +88,7 @@ import {$AppFlags} from './constants.js';
             }
           );
           if (response.acknowledged && response.modifiedCount) {
+            io.to(reqBody.appName).emit(PublishEvents.FLAG, {name: reqBody.name, enabled: reqBody.enabled});
             res.status(200).json({success: true, results: {message: 'flag updated'}, __typename: 'UpdateOne'});
           } else {
             res.status(200).json({success: false, results: {message: 'flag not updated'}, __typename: 'UpdateOne'});
