@@ -2,11 +2,12 @@
   "name": "feature-flag-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "env-cmd node --loader ts-node/esm src/server.ts"
+    "start": "env-cmd node --loader ts-node/esm src/server.ts",
+    "build": "npx tsc -p tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -15,6 +16,9 @@
   "private": true,
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.8",
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.18",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
@@ -23,7 +27,6 @@
     "env-cmd": "^10.1.0",
     "express": "^5.1.0",
     "mongodb": "^6.16.0",
-    "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io": "^4.8.1"
   }
 }

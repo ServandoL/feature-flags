@@ -1,0 +1,18 @@
+services:
+  feature-flag-portal:
+    build:
+      context: ./
+    depends_on:
+      - feature-flag-gql
+    environment:
+      NODE_ENV: production
+    ports:
+      - "9003:8080"
+
+  feature-flag-gql:
+    build:
+      context: ./backend/
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3000:3000"
